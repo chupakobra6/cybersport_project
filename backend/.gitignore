@@ -1,8 +1,8 @@
-django_analyze.py
-project_code_dump.txt
-
 .idea/
 .venv/
+
+django_analyze.py
+project_code_dump.txt
 
 .idea/**/workspace.xml
 .idea/**/tasks.xml
