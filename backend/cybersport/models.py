@@ -74,6 +74,7 @@ class Tournament(BaseModel):
     game = models.CharField(max_length=50, verbose_name='Игра')
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='registration', verbose_name='Статус')
     description = models.TextField(blank=True, null=True, verbose_name='Описание')
+    prize_pool = models.PositiveIntegerField(default=0, verbose_name='Призовой фонд')
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, related_name='tournaments', null=True, verbose_name='Создатель')
 
     class Meta:
