@@ -1,5 +1,7 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AbstractUser
 from django.db import models
+
+from backend import settings
 
 
 class BaseModel(models.Model):
@@ -9,10 +11,18 @@ class BaseModel(models.Model):
     class Meta:
         abstract = True
 
-class UserProfile(BaseModel):
-    nickname = models.CharField(max_length=50, unique=True)
-    about = models.TextField(blank=True, null=True)
-    notifications_enabled = models.BooleanField(default=True)
+
+class CustomUser(AbstractUser):
+    nickname = models.CharField(max_length=50, unique=True, verbose_name='Ник')
+    about = models.TextField(blank=True, null=True, verbose_name='О себе')
+    notifications_enabled = models.BooleanField(default=True, verbose_name='Уведомления включены')
+
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Создан')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Обновлён')
+
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
 
     def __str__(self):
         return self.nickname
@@ -21,7 +31,7 @@ class UserProfile(BaseModel):
 class Team(BaseModel):
     name = models.CharField(max_length=50, unique=True)
     cover = models.ImageField(upload_to='team_cover/', blank=True, null=True)
-    created_by = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, related_name='teams', null=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, related_name='teams', null=True)
 
     def __str__(self):
         return self.name
@@ -35,7 +45,7 @@ class TeamMember(BaseModel):
     )
 
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='members')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='team_members')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='team_members')
     role = models.CharField(max_length=50, choices=ROLE_CHOICES, default='player')
 
     class Meta:
@@ -56,7 +66,8 @@ class Tournament(BaseModel):
     game = models.CharField(max_length=50)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='registration')
     description = models.TextField(blank=True, null=True)
-    created_by = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, related_name='tournaments', null=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, related_name='tournaments',
+                                   null=True)
 
     def __str__(self):
         return self.name
@@ -78,7 +89,7 @@ class News(BaseModel):
     title = models.CharField(max_length=200)
     content = models.TextField()
     cover = models.ImageField(upload_to='news_cover/', blank=True, null=True)
-    author = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, related_name='news', null=True)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, related_name='news', null=True)
     published_at = models.DateTimeField(blank=True, null=True)
     is_published = models.BooleanField(default=False)
 

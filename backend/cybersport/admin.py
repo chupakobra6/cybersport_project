@@ -1,11 +1,22 @@
 from django.contrib import admin
 
-from cybersport.models import UserProfile, Team, TeamMember, Tournament, Match, News
+from cybersport.models import CustomUser, Team, TeamMember, Tournament, Match, News
 
 
-@admin.register(UserProfile)
-class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('id', 'nickname', 'about', 'notifications_enabled', 'created_at', 'updated_at')
+@admin.register(CustomUser)
+class CustomUserAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        ('Личная информация', {'fields': ('nickname', 'about', 'notifications_enabled')}),
+        ('Права', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        ('Даты', {'fields': ('last_login', 'date_joined')}),
+    )
+    list_display = (
+        'id', 'nickname', 'about', 'notifications_enabled', 'created_at', 'updated_at'
+    )
+    list_filter = ('is_active', 'is_staff', 'is_superuser')
+    search_fields = ('username', 'nickname', 'email')
+    ordering = ('-created_at', '-updated_at')
 
 
 @admin.register(Team)

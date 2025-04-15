@@ -1,27 +1,17 @@
-from django.contrib.auth.models import User
-
 from rest_framework import serializers
 
-from cybersport.models import UserProfile, Team, TeamMember, Tournament, Match, News
+from cybersport.models import CustomUser, Team, TeamMember, Tournament, Match, News
 
 
-class UserSerializer(serializers.ModelSerializer):
+class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
-        model = User
-        fields = ('id', 'username', 'email')
-
-
-class UserProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-
-    class Meta:
-        model = UserProfile
+        model = CustomUser
         fields = '__all__'
         read_only_fields = ('id', 'created_at', 'updated_at')
 
 
 class TeamSerializer(serializers.ModelSerializer):
-    created_by = UserProfileSerializer(read_only=True)
+    created_by = CustomUserSerializer(read_only=True)
 
     class Meta:
         model = Team
@@ -31,7 +21,7 @@ class TeamSerializer(serializers.ModelSerializer):
 
 class TeamMemberSerializer(serializers.ModelSerializer):
     team = TeamSerializer(read_only=True)
-    user = UserSerializer(read_only=True)
+    user = CustomUserSerializer(read_only=True)
 
     class Meta:
         model = TeamMember
@@ -40,7 +30,7 @@ class TeamMemberSerializer(serializers.ModelSerializer):
 
 
 class TournamentSerializer(serializers.ModelSerializer):
-    created_by = UserProfileSerializer(read_only=True)
+    created_by = CustomUserSerializer(read_only=True)
 
     class Meta:
         model = Tournament
@@ -60,7 +50,7 @@ class MatchSerializer(serializers.ModelSerializer):
 
 
 class NewsSerializer(serializers.ModelSerializer):
-    author = UserProfileSerializer(read_only=True)
+    author = CustomUserSerializer(read_only=True)
 
     class Meta:
         model = News
