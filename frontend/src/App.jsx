@@ -1,35 +1,50 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react'
+import {Routes, Route, Navigate} from 'react-router-dom'
+import {AuthProvider} from './contexts/AuthContext'
+import Layout from './components/Layout'
+import HomePage from './pages/HomePage'
+import LoginPage from './pages/LoginPage'
+import TournamentsPage from './pages/TournamentsPage'
+import TournamentDetailsPage from './pages/TournamentDetailsPage'
+import NewsPage from './pages/NewsPage'
+import TeamPage from './pages/TeamPage'
+import CreateTournamentPage from './pages/CreateTournamentPage'
+import CreateNewsPage from './pages/CreateNewsPage'
+import RegisterPage from './pages/RegisterPage'
 
-function App() {
-  const [count, setCount] = useState(0)
+const PrivateRoute = ({children}) => {
+    const isAuthenticated = localStorage.getItem('token');
+    return isAuthenticated ? children : <Navigate to="/login"/>;
+};
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+export default function App() {
+    return (
+        <AuthProvider>
+            <Layout>
+                <Routes>
+                    <Route path="/" element={<HomePage/>}/>
+                    <Route path="/login" element={<LoginPage/>}/>
+                    <Route path="/register" element={<RegisterPage/>}/>
+                    <Route path="/tournaments" element={<TournamentsPage/>}/>
+                    <Route path="/tournaments/:id" element={<TournamentDetailsPage/>}/>
+                    <Route path="/news" element={<NewsPage/>}/>
+                    <Route path="/team" element={<TeamPage/>}/>
+
+                    {/* Приватные маршруты */}
+                    <Route path="/create-tournament" element={
+                        <PrivateRoute>
+                            <CreateTournamentPage/>
+                        </PrivateRoute>
+                    }/>
+                    <Route path="/create-news" element={
+                        <PrivateRoute>
+                            <CreateNewsPage/>
+                        </PrivateRoute>
+                    }/>
+
+                    <Route path="*" element={<Navigate to="/" replace/>}/>
+                </Routes>
+            </Layout>
+        </AuthProvider>
+    )
 }
-
-export default App
